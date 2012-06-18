@@ -27,3 +27,44 @@ describe('#get', function() {
     }
   });
 });
+
+describe('#expires', function() {
+  it('should expire a value after 10ms', function(done) {
+    var cache = goldfish.createGoldfish({
+      populate: function(key, cb) {
+        cb(null, key);
+      },
+      expires: 10,
+      cleanup: 1
+    });
+
+    cache.on('evict', function() {
+      done();
+    });
+    cache.get('test', function() {});
+  });
+
+  it('should evict multiple', function(done) {
+    var cache
+      , i
+      , count = 0
+      , num = 200
+      ;
+
+    cache = goldfish.createGoldfish({
+      populate: function(key, cb) {
+        cb(null, key);
+      },
+      expires: 10,
+      cleanup: 1
+    });
+
+    cache.on('evict', function() {
+      if(++count === num) done();
+    });
+
+    for(i=0; i<num; ++i) {
+      cache.get('' + i, function() {});
+    }
+  })
+});

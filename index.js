@@ -126,6 +126,8 @@ Goldfish.prototype._evict = function(key, reason, silent) {
     , env
     ;
 
+  if(!entry) return;
+
   this._pullEntry(entry);
   delete this._cache[key];
   --this._size;
