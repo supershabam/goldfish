@@ -215,7 +215,4 @@ Goldfish.prototype._cleanup = function() {
   }
 };
 
-exports.createGoldfish = function(options) {
-  return new Goldfish(options);
-};
-exports.EVICT_REASONS = EVICT_REASONS;
+module.exports = Goldfish;
