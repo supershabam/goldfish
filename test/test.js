@@ -1,4 +1,4 @@
-var goldfish = require('../');
+var Goldfish = require('../');
 
 describe('#get', function() {
   it('should allow unpopulated key to be requested many times at once and return all of them once populated', function(done) {
@@ -9,7 +9,7 @@ describe('#get', function() {
       , callback
       ;
     
-    cache = goldfish.createGoldfish({
+    cache = new Goldfish({
       populate: function(key, cb) {
         setTimeout(function() {
           cb(null, key);
@@ -26,11 +26,32 @@ describe('#get', function() {
       cache.get('test', callback);
     }
   });
+
+  it('should call populate only once when the same value is being fetched', function(done) {
+    var cache
+      , populateCount = 0
+      ;
+
+    cache = new Goldfish({
+      populate: function(key, cb) {
+        ++populateCount;
+        setTimeout(function() {
+          cb(null, key);
+        }, 10);
+      }
+    });
+
+    cache.get('test', function() {});
+    cache.get('test', function(err, value) {
+      if (populateCount === 1) return done();
+      return done(new Error('expected populateCount to be 1'));
+    });
+  });
 });
 
 describe('#expires', function() {
   it('should expire a value after 10ms', function(done) {
-    var cache = goldfish.createGoldfish({
+    var cache = new Goldfish({
       populate: function(key, cb) {
         cb(null, key);
       },
@@ -51,7 +72,7 @@ describe('#expires', function() {
       , num = 200
       ;
 
-    cache = goldfish.createGoldfish({
+    cache = new Goldfish({
       populate: function(key, cb) {
         cb(null, key);
       },

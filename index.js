@@ -35,6 +35,7 @@ function Goldfish(options) {
   this._oldest = NULL;
   this._size = 0;
   this._cleanupInterval = null;
+  this._fetching = {};
 
   // magical thisness
   this._cleanup = this._cleanup.bind(this);
@@ -81,17 +82,26 @@ Goldfish.prototype.evict = function(key, silent) {
   }
 };
 
-// events fired: evict, evict:expired, evict:manual, evict:capacity
-
 Goldfish.prototype._fetch = function(populate, key, cb) {
   var self = this;
 
-  populate(key, function(err, value) {
-    if (err) return cb(err);
+  if (this._fetching.hasOwnProperty(key)) {
+    this._fetching[key].push(cb);
+  } else {
+    this._fetching[key] = [cb];
 
-    self._insert(key, value);
-    cb(null, value);
-  });
+    populate(key, function handlePopulateResponse(err, value) {
+      var i;
+
+      // add to cache if we got a value
+      if (!err) self._insert(key, value);
+
+      // notify everybody waiting on this result (error or value)
+      for(i=0; i < self._fetching[key].length; ++i) {
+        self._fetching[key][i](null, value);
+      }
+    });
+  }
 };
 
 Goldfish.prototype._insert = function(key, value) {
