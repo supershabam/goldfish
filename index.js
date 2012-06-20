@@ -100,6 +100,9 @@ Goldfish.prototype._fetch = function(populate, key, cb) {
       for(i=0; i < self._fetching[key].length; ++i) {
         self._fetching[key][i](null, value);
       }
+
+      // clear fetchers
+      delete self._fetching[key];
     });
   }
 };
