@@ -47,6 +47,19 @@ describe('#get', function() {
       return done(new Error('expected populateCount to be 1'));
     });
   });
+
+  it('should return an error', function(done) {
+    var cache = new Goldfish({
+      populate: function(key, cb) {
+        cb('error');
+      }
+    });
+
+    cache.get('test', function(err, value) {
+      if (err == 'error') return done();
+      done('should have gotten an error');
+    });
+  });
 });
 
 describe('#expires', function() {

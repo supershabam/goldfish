@@ -11,6 +11,9 @@ var util = require('util')
   , EVICT_REASONS
   ;
 
+// @TODO get rid of NULL, no longer needed
+// @TODO allow keys to be more than just strings. Objects 'n' such
+
 EVICT_REASONS = {
   CAPACITY: 'capacity',
   EXPIRED: 'expired',
@@ -98,7 +101,7 @@ Goldfish.prototype._fetch = function(populate, key, cb) {
 
       // notify everybody waiting on this result (error or value)
       for(i=0; i < self._fetching[key].length; ++i) {
-        self._fetching[key][i](null, value);
+        self._fetching[key][i](err, value);
       }
 
       // clear fetchers
@@ -128,6 +131,7 @@ Goldfish.prototype._insert = function(key, value) {
   }
 
   // start the cleanup thread if not already running
+  // @TODO only run if evict time is set
   if(!this._cleanupInterval) {
     this._cleanupInterval = setInterval(this._cleanup, this._cleanupPeriod);
   }
