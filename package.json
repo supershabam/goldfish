@@ -5,7 +5,7 @@
   "version": "0.0.6",
   "repository": {
     "type": "git",
-    "url": "git://github.com/SuperShabam/goldfish.git"
+    "url": "git://github.com/supershabam/goldfish.git"
   },
   "engines": {
     "node": "~0.6.10"
