@@ -1,18 +1,16 @@
 {
-  "author": "Ian Hansen <ian@supershabam.com>",
+  "author": "Ian Hansen",
   "name": "goldfish",
   "description": "Evented in-memory cache",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "repository": {
     "type": "git",
     "url": "git://github.com/supershabam/goldfish.git"
   },
-  "engines": {
-    "node": "~0.6.10"
+  "dependencies": {
   },
-  "dependencies": {},
   "devDependencies": {
-    "mocha": "~1.1.0"
+    "mocha": "~1.4.0"
   },
   "optionalDependencies": {},
   "scripts": {
