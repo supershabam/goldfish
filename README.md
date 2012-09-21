@@ -1,9 +1,11 @@
 goldfish
 ========
 
+Evented JavaScript in-memory cache
+
 [![Build Status](https://secure.travis-ci.org/supershabam/goldfish.png?branch=master)](http://travis-ci.org/supershabam/goldfish)
 
-Evented JavaScript in-memory cache
+[![endorse](http://api.coderwall.com/supershabam/endorsecount.png)](http://coderwall.com/supershabam)
 
 Example
 =======
