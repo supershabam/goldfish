@@ -1,5 +1,7 @@
-lib
+node_modules
 lib-cov
+.travis.yml
+.gitignore
 *.seed
 *.log
 *.csv
@@ -12,5 +14,4 @@ pids
 logs
 results
 
-node_modules
 npm-debug.log

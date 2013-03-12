@@ -11,16 +11,19 @@
 #       \) |`\ \)  '.   \
 #          \_/   jgs '-._\
 #                        `
+{EventEmitter} = require "events"
 jsosort = require "jsosort"
+moment = require "moment"
 NULL = null
 exports = module.exports = class Goldfish extends EventEmitter
   constructor: (options)->
     throw new Error("must specify populate function") unless options?.populate and typeof options.populate is "function"
     @_populate = options.populate
-    @_context = options?.context? then options.context else null
+    @_context = if options?.context? then options.context else null
     @_expires = if options?.expires? then options.expires else Infinity
-    @_remind = if options.?remind? then options.remind else false
+    @_remind = if options?.remind? then options.remind else false
     @_capacity = if options?.capacity? then options.capacity else Infinity
+    throw new Error("must have at least 0 capacity") if @_capacity < 0
     @_garbageInterval = if options?.garbageInterval? then options.garbageInterval else 60000
     @_cache = Object.create(null)
     @_queue = Object.create(null)
@@ -47,29 +50,39 @@ exports = module.exports = class Goldfish extends EventEmitter
     return @_queue[hash].push(cb) if @_isQueued(hash)
     # alright, let's go get the value
     @_queue[hash] = [cb]
-    args.push (err, result...)->
+    args.push (err, result...)=>
       # only write result if we got one
-      @_insert(hash, result) unless err
+      @_insert(hash, args, result) unless err
       functions = @_queue[hash][..]
       delete @_queue[hash]
       for fn in functions
         fn.apply(null, [err].concat(result))
     @_populate.apply(@_context, args)
+  _clean: =>
+  _evict: (hash)=>
+    console.log "evict", hash
+    return unless @_has(hash)
+    @_pullEntry(entry)
+  _has: (hash)=>
+    return Object.hasOwnProperty.call(@_cache, hash)
   _hash: (args)=>
-
-  _insert: (hash, result)=>
+    result = []
+    for arg in args
+      if Object.prototype.toString.call(arg) is "[object Object]"
+        arg = jsosort(arg)
+      result.push(arg)
+    return JSON.stringify(result)
+  _insert: (hash, args, result)=>
     entry =
       hash: hash
+      args: args
       result: result
       expires: moment() + @_expires
-    @_evict(@_oldest, "capacity") while @_size >= @_capacity
+    @_evict(@_oldest) while @_size > @_capacity
     @_cache[hash] = entry
     @_size += 1
-  _refresh: (hash)=>
-    entry = @_cache[hash]
-    @_pullEntry(entry)
-    @_pushEntry(entry)
-    entry.expires = @_expires + moment().valueOf()
+  _isQueued: (hash)=>
+    return Object.hasOwnProperty.call(@_queue, hash)
   _pullEntry: (entry)=>
     if entry.older isnt NULL and entry.newer isnt NULL
       entry.older.newer = entry.newer
@@ -94,3 +107,8 @@ exports = module.exports = class Goldfish extends EventEmitter
       entry.older = @_newest
       entry.newer = NULL
       @_newest = entry
+  _refresh: (hash)=>
+    entry = @_cache[hash]
+    @_pullEntry(entry)
+    @_pushEntry(entry)
+    entry.expires = @_expires + moment().valueOf()
