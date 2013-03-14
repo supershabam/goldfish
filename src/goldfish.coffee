@@ -51,21 +51,22 @@ exports = module.exports = class Goldfish extends EventEmitter
     return @_queue[hash].push(cb) if @_isQueued(hash)
     # alright, let's go get the value
     @_queue[hash] = [cb]
-    args.push (err, result...)=>
+    callback = (err, result...)=>
       # only write result if we got one
       @_insert(hash, args, result) unless err
       functions = @_queue[hash][..]
       delete @_queue[hash]
       for fn in functions
         fn.apply(null, [err].concat(result))
-    @_populate.apply(@_context, args)
+    @_populate.apply(@_context, args.concat([callback]))
   _clean: =>
-  _evict: (hash)=>
-    console.log "evict", hash
-    return unless @_has(hash)
-    @_pullEntry(entry)
+  _evict: (entry)=>
+    if @_has(entry.hash)
+      @_pullEntry(entry)
+      delete @_cache[entry.hash]
+      @emit("evict", entry)
   _has: (hash)=>
-    return Object.hasOwnProperty.call(@_cache, hash)
+    return Object.prototype.hasOwnProperty.call(@_cache, hash)
   _hash: (args)=>
     result = []
     for arg in args
@@ -79,9 +80,12 @@ exports = module.exports = class Goldfish extends EventEmitter
       args: args
       result: result
       expires: moment() + @_expires
-    @_evict(@_oldest) while @_size > @_capacity
-    @_cache[hash] = entry
     @_size += 1
+    while @_size > @_capacity
+      @_evict(@_oldest)
+      @_size -= 1
+    @_pushEntry(entry)
+    @_cache[hash] = entry
   _isQueued: (hash)=>
     return Object.hasOwnProperty.call(@_queue, hash)
   _pullEntry: (entry)=>

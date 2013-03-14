@@ -60,40 +60,38 @@ describe "goldfish", ->
     setTimeout(at500, 500)
     clock.tick(1500)
   it "should evict on over capacity", (done)->
-    populate = (arg1, arg2, cb)->
-      return cb(null, arg2, arg1)
+    populate = (arg, cb)->
+      return cb(null, arg)
     cache = new Goldfish({populate: populate, capacity: 2})
+    evictHasBeenCalled = false
     cache.on "evict", (entry)->
-      expect(entry.args).to.eql ["arg1", "arg2"]
-      expect(entry.result).to.eql ["arg2", "arg1"]
+      evictHasBeenCalled = true
+      expect(entry.args).to.eql ["1"]
+      expect(entry.result).to.eql ["1"]
       expect(entry.expires).to.eql Infinity
       expect(getCount).to.equal 3
     getCount = 0
-    cache.get "arg1", "arg2", (err, result1, result2)->
+    cache.get "1", (err, result)->
       expect(err).to.not.be.ok
-      expect(result1).to.equal "arg2"
-      expect(result2).to.equal "arg1"
+      expect(result).to.equal "1"
       expect(getCount).to.equal 0
       getCount += 1
       # use cached result, no increase in capacity
-      cache.get "arg1", "arg2", (err, result1, result2)->
+      cache.get "1", (err, result)->
         expect(err).to.not.be.ok
-        expect(result1).to.equal "arg2"
-        expect(result2).to.equal "arg1"
+        expect(result).to.equal "1"
         expect(getCount).to.equal 1
         getCount += 1
-
-        cache.get "one", "two", (err, result1, result2)->
+        cache.get "2", (err, result)->
           expect(err).to.not.be.ok
-          expect(result1).to.equal "two"
-          expect(result2).to.equal "one"
+          expect(result).to.equal "2"
           expect(getCount).to.equal 2
           getCount += 1          
-          cache.get "new", "entry", (err, result1, result2)->
+          cache.get "3", (err, result)->
             expect(err).to.not.be.ok
-            expect(result1).to.equal "entry"
-            expect(result2).to.equal "new"
+            expect(result).to.equal "3"
             expect(getCount).to.equal 3
+            expect(evictHasBeenCalled).to.be.ok
             done()
             
 
