@@ -1,3 +1,4 @@
+async = require "async"
 Goldfish = require "#{LIB_ROOT}/goldfish"
 describe "goldfish", ->
   clock = null
@@ -141,3 +142,20 @@ describe "goldfish", ->
           shouldExpire = true
           clock.tick(10001)
           cache.get "key", (err, value)->
+  it "should clear cache", (done)->
+    populate = (arg, cb)->
+      return cb(null, arg)
+    cache = new Goldfish({populate: populate})
+    work = []
+    for i in [0...20]
+      do (i)->
+        work.push (callback)->
+          cache.get i, callback
+    async.parallel work, (err)->
+      return done(err) if err
+      count = 0
+      cache.on "evict", (entry)->
+        count += 1
+      cache.clear()
+      expect(count).to.equal 20
+      done()
