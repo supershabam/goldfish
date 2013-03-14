@@ -1,9 +1,8 @@
 Goldfish = require "#{LIB_ROOT}/goldfish"
 describe "goldfish", ->
   clock = null
-  afterEach (done)->  
-    clock.restore() if typeof clock is "function"
-    done()
+  afterEach ->
+    clock.restore() if clock
   it "should run populate with variable args and variable response", (done)->
     hasRunPopulate = false
     populate = (arg1, arg2, arg3, cb)->
@@ -83,6 +82,7 @@ describe "goldfish", ->
         expect(result2).to.equal "arg1"
         expect(getCount).to.equal 1
         getCount += 1
+
         cache.get "one", "two", (err, result1, result2)->
           expect(err).to.not.be.ok
           expect(result1).to.equal "two"
@@ -95,4 +95,5 @@ describe "goldfish", ->
             expect(result2).to.equal "new"
             expect(getCount).to.equal 3
             done()
+            
 

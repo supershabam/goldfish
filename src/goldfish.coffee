@@ -45,7 +45,8 @@ exports = module.exports = class Goldfish extends EventEmitter
       @_refresh(hash) if @_remind
       # do callback on next cpu event (allow caller to operate truly async)
       result = @_cache[hash].result
-      return process.nextTick(cb.apply({}, [null].concat(result)))
+      return process.nextTick ->
+        cb.apply({}, [null].concat(result))
     # are we already fetching that value?
     return @_queue[hash].push(cb) if @_isQueued(hash)
     # alright, let's go get the value
