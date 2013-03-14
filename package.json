@@ -24,6 +24,6 @@
   },
   "optionalDependencies": {},
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "test": "grunt test"
   }
 }
