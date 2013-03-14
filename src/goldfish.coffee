@@ -50,11 +50,10 @@ exports = module.exports = class Goldfish extends EventEmitter
     @_queue[hash] = [cb]
     callback = (err, result...)=>
       # only write result if we got one
-      @_insert(hash, args, result) unless err
-      functions = @_queue[hash][..]
-      delete @_queue[hash]
-      for fn in functions
+      @_insert(hash, args, result) unless err      
+      for fn in @_queue[hash]
         fn.apply(null, [err].concat(result))
+      delete @_queue[hash]
     @_populate.apply(null, args.concat([callback]))
   clear: =>
     while @_size > 0
@@ -85,7 +84,7 @@ exports = module.exports = class Goldfish extends EventEmitter
     @_pushEntry(entry)
     @_cache[hash] = entry
   _isQueued: (hash)=>
-    return Object.hasOwnProperty.call(@_queue, hash)
+    return Object.prototype.hasOwnProperty.call(@_queue, hash)
   _pullEntry: (entry)=>
     if entry.older isnt NULL and entry.newer isnt NULL
       entry.older.newer = entry.newer
