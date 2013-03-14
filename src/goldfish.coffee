@@ -59,10 +59,13 @@ exports = module.exports = class Goldfish extends EventEmitter
       for fn in functions
         fn.apply(null, [err].concat(result))
     @_populate.apply(@_context, args.concat([callback]))
-  _clean: =>
+  clear: =>
+    while @_size > 0
+      @_evict(@_oldest)
   _evict: (entry)=>
     if @_has(entry.hash)
       @_pullEntry(entry)
+      @_size -= 1
       delete @_cache[entry.hash]
       @emit("evict", entry)
   _has: (hash)=>
@@ -81,9 +84,7 @@ exports = module.exports = class Goldfish extends EventEmitter
       result: result
       expires: moment() + @_expires
     @_size += 1
-    while @_size > @_capacity
-      @_evict(@_oldest)
-      @_size -= 1
+    @_evict(@_oldest) while @_size > @_capacity
     @_pushEntry(entry)
     @_cache[hash] = entry
   _isQueued: (hash)=>
