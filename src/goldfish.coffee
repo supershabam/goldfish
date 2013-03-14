@@ -24,13 +24,11 @@ exports = module.exports = class Goldfish extends EventEmitter
     @_remind = if options?.remind? then options.remind else false
     @_capacity = if options?.capacity? then options.capacity else Infinity
     throw new Error("must have at least 0 capacity") if @_capacity < 0
-    @_garbageInterval = if options?.garbageInterval? then options.garbageInterval else 60000
     @_cache = Object.create(null)
     @_queue = Object.create(null)
     @_newest = NULL
     @_oldest = NULL
     @_size = 0
-    @_cleaner = setInterval(@_clean, @_garbageInterval)
   ##
   # args Call with the number of arguments that should be passed to populate
   # cb Function
@@ -38,7 +36,7 @@ exports = module.exports = class Goldfish extends EventEmitter
     now = moment().valueOf()
     hash = @_hash(args)
     # before reading from local cache, expire this hash if it's too old
-    @_expire(hash) if @_has(hash) and @_cache[hash].expires < now
+    @_evict(@_cache[hash]) if @_has(hash) and @_cache[hash].expires < now
     # commence cache retreival
     if @_has(hash)
       # refresh the key if we're in remind mode

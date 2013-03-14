@@ -93,5 +93,51 @@ describe "goldfish", ->
             expect(getCount).to.equal 3
             expect(evictHasBeenCalled).to.be.ok
             done()
-            
-
+  it "should return errors, and not cache them", (done)->
+    populate = (arg, cb)->
+      return cb(new Error("OMG"))
+    cache = new Goldfish({populate: populate})
+    cache.get "test", (err, value)->
+      expect(err).to.be.ok
+      expect(cache._size).to.equal 0
+      done()
+  it "should expire after 10ms even if I get the key just before", (done)->
+    clock = sinon.useFakeTimers()
+    populate = (arg, cb)->
+      return cb(null, arg)
+    cache = new Goldfish({populate: populate, expires: 10000})
+    cache.get "key", (err, value)->
+      expect(err).to.not.be.ok
+      expect(value).to.equal "key"
+      clock.tick(9000)
+      cache.get "key", (err, value)->
+        expect(err).to.not.be.ok
+        expect(value).to.equal "key"
+        cache.on "evict", (entry)->
+          expect(entry.result).to.eql ["key"]
+          expect(cache._size).to.equal 0
+        clock.tick(1050)
+        cache.get "key", (err, value)->
+          expect(err).to.not.be.ok 
+          expect(value).to.equal "key"
+          done()
+  it "should refresh keys after I fetch them", (done)->
+    clock = sinon.useFakeTimers()
+    shouldExpire = false
+    populate = (arg, cb)->
+      return cb(null, arg)
+    cache = new Goldfish({populate: populate, expires: 10000, remind: true})
+    cache.on "evict", (entry)->
+      expect(shouldExpire).to.be.ok
+      done()
+    cache.get "key", (err, value)->
+      expect(value).to.equal "key"
+      clock.tick(9000)
+      cache.get "key", (err, value)->
+        expect(value).to.equal "key"
+        clock.tick(9000)
+        cache.get "key", (err, value)->
+          expect(value).to.equal "key"
+          shouldExpire = true
+          clock.tick(10001)
+          cache.get "key", (err, value)->
