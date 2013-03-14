@@ -71,3 +71,13 @@ Performance
 **get#hit** O(1)  
 **get#miss** O(1) + Populate()
 **clear** O(n)
+
+Changelog
+=========
+
+0.1.0
+-----
+
+Complete disregard for the previous api. Don't blindly update.
+Smaller, simpler api.
+
