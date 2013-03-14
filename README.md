@@ -13,7 +13,7 @@ Goldfish - the forgetful in-memory cache
 //       \) |`\ \)  '.   \
 //          \_/   jgs '-._\
 //                        `
-```javascript
+```
 
 [![Build Status](https://secure.travis-ci.org/supershabam/goldfish.png?branch=master)](http://travis-ci.org/supershabam/goldfish)
 
