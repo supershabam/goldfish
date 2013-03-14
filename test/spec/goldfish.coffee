@@ -159,3 +159,16 @@ describe "goldfish", ->
       cache.clear()
       expect(count).to.equal 20
       done()
+  it "should call callback only once", (done)->
+    count = 0
+    clock = sinon.useFakeTimers()
+    populate = (arg, cb)->
+      setTimeout(cb.bind(null, new Error("lulz")), 1000)
+    cache = new Goldfish({populate: populate})
+    setTimeout(done, 2000)
+    cache.get "test", (err, value)->
+      count += 1
+      expect(count).to.equal 1
+      expect(err).to.be.ok
+      clock.tick(1000)
+    clock.tick(1000)
