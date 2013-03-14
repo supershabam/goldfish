@@ -1,5 +1,5 @@
 ##
-# Goldfish - the cache the forgets
+# Goldfish - the forgetful in-memory cache
 # Copyright(c) 2013 Ian Hansen <ian@supershabam.com>
 # MIT Licensed
 #          _,           _,
