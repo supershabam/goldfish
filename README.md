@@ -1,11 +1,34 @@
-goldfish
+Goldfish
 ========
 
-Evented JavaScript in-memory cache
+Goldfish - the forgetful in-memory cache
+
+```javascript
+//          _,           _,
+//        .' (        .-' /
+//      _/..._'.    .'   /
+//  .-'`      ` '-./  _.'
+// ( o)           ;= <_
+//  '-.,\\__ __.-;`\   '.
+//       \) |`\ \)  '.   \
+//          \_/   jgs '-._\
+//                        `
+```
 
 [![Build Status](https://secure.travis-ci.org/supershabam/goldfish.png?branch=master)](http://travis-ci.org/supershabam/goldfish)
 
 [![endorse](http://api.coderwall.com/supershabam/endorsecount.png)](http://coderwall.com/supershabam)
+
+Options
+=======
+```javascript
+Goldfish({
+  populate: // fn(arg1, arg2, ..., cb)
+  expires: // (optional) Integer - miliseconds before a cache item is expired (default = Infinity)
+  remind: // (optional) Boolean - refresh expire time on fetch (default = false)
+  capacity: // (optional) Integer - max number of items to have in the cache (default = Infinity)
+});
+```
 
 Example
 =======
@@ -34,24 +57,17 @@ cache.get('test', function(err, result) {
 });
 
 // listen for any evictions
-cache.on('evict', function(evict) {
-  console.log(evict.key);   // the key of the item being evicted
-  console.log(evict.value); // the value of key that is being removed from the cache
-  console.log(evict.reason); // the reason the eviction occured (manual, capacity, expired)
+cache.on('evict', function(entry) {
+  console.log(entry.args); // Array - the args passed to populate resulting in this entry
+  console.log(evict.result); // Array - the results from populate
 });
-
-// can also listen for specific types of evictions
-cache.on('evict:manual', function(evict) {
-  console.log(evict.key);
-});
-
-cache.evict('test');
+// clear the cache
+cache.clear();
 ```
 
 Performance
 ===========
 
 **get#hit** O(1)  
-**get#miss** O(1) + O(populate)  
-**evict** O(1)  
-**expire** O(1)  
+**get#miss** O(1) + Populate()
+**clear** O(n)

@@ -2,18 +2,28 @@
   "author": "Ian Hansen",
   "name": "goldfish",
   "description": "Evented in-memory cache",
-  "version": "0.0.8",
+  "version": "0.1.0",
   "repository": {
     "type": "git",
     "url": "git://github.com/supershabam/goldfish.git"
   },
   "dependencies": {
+    "jsosort": "0.0.0",
+    "moment": "~2.0.0"
   },
   "devDependencies": {
-    "mocha": "~1.4.0"
+    "mocha": "~1.8.2",
+    "grunt": "~0.4.0",
+    "grunt-contrib-coffee": "~0.6.0",
+    "grunt-contrib-clean": "~0.4.0",
+    "chai": "~1.5.0",
+    "sinon-chai": "~2.3.1",
+    "sinon": "~1.6.0",
+    "coffee-script": "~1.6.1",
+    "async": "~0.2.6"
   },
   "optionalDependencies": {},
   "scripts": {
-    "test": "./node_modules/.bin/mocha"
+    "test": "grunt test"
   }
 }
