@@ -19,7 +19,6 @@ exports = module.exports = class Goldfish extends EventEmitter
   constructor: (options)->
     throw new Error("must specify populate function") unless options?.populate and typeof options.populate is "function"
     @_populate = options.populate
-    @_context = if options?.context? then options.context else null
     @_expires = if options?.expires? then options.expires else Infinity
     @_remind = if options?.remind? then options.remind else false
     @_capacity = if options?.capacity? then options.capacity else Infinity
@@ -56,7 +55,7 @@ exports = module.exports = class Goldfish extends EventEmitter
       delete @_queue[hash]
       for fn in functions
         fn.apply(null, [err].concat(result))
-    @_populate.apply(@_context, args.concat([callback]))
+    @_populate.apply(null, args.concat([callback]))
   clear: =>
     while @_size > 0
       @_evict(@_oldest)
