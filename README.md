@@ -74,7 +74,7 @@ cache.clear();
 Complicated key lookup
 ----------------------
 ```javascript
-var redisClient = require('redis').createClient()
+var db = require('./mydb')
   , Goldfish = require('goldfish')
   , cache
   ;
@@ -103,7 +103,7 @@ Performance
 ===========
 
 **get#hit** O(1)  
-**get#miss** O(Populate)
+**get#miss** O(Populate)  
 **clear** O(n)
 
 Changelog
